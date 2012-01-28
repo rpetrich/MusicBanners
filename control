@@ -1,0 +1,17 @@
+Package: com.rpetrich.musicbanners
+Priority: optional
+Section: Tweaks
+Maintainer: BigBoss <bigboss@thebigboss.org>
+Architecture: iphoneos-arm
+Version: 0.1
+Description: Banners for track changes
+Name: MusicBanners
+Conflicts: com.rpetrich.musicbanners
+Replaces: com.rpetrich.musicbanners
+Depends: firmware (>= 5.0), mobilesubstrate
+Homepage: http://moreinfo.thebigboss.org/moreinfo/depiction.php?file=musicbannersData
+Depiction: http://moreinfo.thebigboss.org/moreinfo/depiction.php?file=musicbannersData
+Sponsor: thebigboss.org <http://thebigboss.org>
+Author: Ryan Petrich <rpetrich+musicbanners@gmail.com>
+Tag: purpose::extension
+dev: rpetrich
