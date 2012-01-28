@@ -106,8 +106,8 @@ static MusicBannersProvider *sharedProvider;
 			bulletin.showsUnreadIndicator = NO;
 		}
 		bulletin.title = title;
-		bulletin.subtitle = artist;
-		bulletin.message = album;
+		bulletin.subtitle = album;
+		bulletin.message = artist;
 		NSDate *date = [NSDate date];
 		bulletin.date = date;
 		bulletin.lastInterruptDate = date;
