@@ -96,22 +96,24 @@ static MusicBannersProvider *sharedProvider;
 	}
 	if (hasChanges) {
 		BBDataProviderWithdrawBulletinsWithRecordID(self, @"com.apple.mobileipod/banner");
-		if (!bulletin) {
-			bulletin = [[BBBulletinRequest alloc] init];
-			bulletin.sectionID = @"com.apple.mobileipod/banner";
-			bulletin.defaultAction = [BBAction actionWithLaunchURL:[NSURL URLWithString:@"music://"] callblock:nil];
-			bulletin.bulletinID = @"com.apple.mobileipod/banner";
-			bulletin.publisherBulletinID = @"com.apple.mobileipod/banner";
-			bulletin.recordID = @"com.apple.mobileipod/banner";
-			bulletin.showsUnreadIndicator = NO;
+		if ([artist length] && [title length]) {
+			if (!bulletin) {
+				bulletin = [[BBBulletinRequest alloc] init];
+				bulletin.sectionID = @"com.apple.mobileipod/banner";
+				bulletin.defaultAction = [BBAction actionWithLaunchURL:[NSURL URLWithString:@"music://"] callblock:nil];
+				bulletin.bulletinID = @"com.apple.mobileipod/banner";
+				bulletin.publisherBulletinID = @"com.apple.mobileipod/banner";
+				bulletin.recordID = @"com.apple.mobileipod/banner";
+				bulletin.showsUnreadIndicator = NO;
+			}
+			bulletin.title = title;
+			bulletin.subtitle = album;
+			bulletin.message = artist;
+			NSDate *date = [NSDate date];
+			bulletin.date = date;
+			bulletin.lastInterruptDate = date;
+			BBDataProviderAddBulletin(self, bulletin);
 		}
-		bulletin.title = title;
-		bulletin.subtitle = album;
-		bulletin.message = artist;
-		NSDate *date = [NSDate date];
-		bulletin.date = date;
-		bulletin.lastInterruptDate = date;
-		BBDataProviderAddBulletin(self, bulletin);
 	}
 }
 
