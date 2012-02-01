@@ -2,7 +2,7 @@
 #import <CoreGraphics/CoreGraphics.h>
 #import <UIKit/UIKit.h>
 
-@class BBSectionInfo;
+@class BBSectionInfo, BBThumbnailSizeConstraints;
 
 @protocol BBDataProvider <NSObject>
 -(NSString *)sectionIdentifier;
@@ -12,7 +12,7 @@
 -(NSString *)sectionDisplayName;
 -(void)dataProviderDidLoad;
 -(CGFloat)attachmentAspectRatioForRecordID:(NSString *)recordID;
--(NSData *)attachmentPNGDataForRecordID:(NSString *)recordID sizeConstraints:(id)constraints;
+-(NSData *)attachmentPNGDataForRecordID:(NSString *)recordID sizeConstraints:(BBThumbnailSizeConstraints *)sizeConstraints;
 -(BBSectionInfo *)defaultSectionInfo;
 -(id)sectionParameters;
 -(id)clearedInfoForBulletins:(NSArray *)bulletins;
@@ -301,10 +301,10 @@
 -(void)observer:(id)observer finishedWithBulletinID:(id)bulletinID transactionID:(unsigned)anId;
 -(void)observer:(id)observer handleResponse:(id)response;
 -(void)observer:(id)observer setObserverFeed:(unsigned)feed;
--(void)getAttachmentAspectRatioForBulletinID:(id)bulletinID withHandler:(id)handler;
--(void)getAttachmentPNGDataForBulletinID:(id)bulletinID sizeConstraints:(id)constraints withHandler:(id)handler;
--(void)getSectionParametersForSectionID:(id)sectionID withHandler:(id)handler;
--(void)getSortDescriptorsForSectionID:(id)sectionID withHandler:(id)handler;
+-(void)getAttachmentAspectRatioForBulletinID:(NSString *)bulletinID withHandler:(id)handler;
+-(void)getAttachmentPNGDataForBulletinID:(NSString *)bulletinID sizeConstraints:(id)constraints withHandler:(id)handler;
+-(void)getSectionParametersForSectionID:(NSString *)sectionID withHandler:(id)handler;
+-(void)getSortDescriptorsForSectionID:(NSString *)sectionID withHandler:(id)handler;
 -(void)getSectionOrderRuleWithHandler:(id)handler;
 -(id)_interruptingBulletinIDsForFeeds:(unsigned)feeds;
 -(void)_expireInterruptions;
@@ -361,6 +361,28 @@
 -(id)init;
 @end
 
+@interface BBThumbnailSizeConstraints : NSObject <NSCoding> {
+@private
+	int _constraintType;
+	CGFloat _fixedWidth;
+	CGFloat _fixedHeight;
+	CGFloat _fixedDimension;
+	CGFloat _minAspectRatio;
+	CGFloat _maxAspectRatio;
+	CGFloat _thumbnailScale;
+}
+@property (assign, nonatomic) CGFloat thumbnailScale;
+@property (assign, nonatomic) CGFloat maxAspectRatio;
+@property (assign, nonatomic) CGFloat minAspectRatio;
+@property (assign, nonatomic) CGFloat fixedDimension;
+@property (assign, nonatomic) CGFloat fixedHeight;
+@property (assign, nonatomic) CGFloat fixedWidth;
+@property (assign, nonatomic) int constraintType;
+- (BOOL)areReasonable;
+- (void)encodeWithCoder:(NSCoder *)encoder;
+- (id)initWithCoder:(NSCoder *)decoder;
+@end
+
 extern void BBDataProviderAddBulletin(id <BBDataProvider> dataProvider, BBBulletin *bulletin);
 extern void BBDataProviderInvalidateBulletins(id <BBDataProvider> dataProvider, NSArray *bulletins);
 extern void BBDataProviderWithdrawBulletinsWithRecordID(id <BBDataProvider> dataProvider, NSString *recordID);
@@ -375,4 +397,8 @@ extern void BBDataProviderWithdrawBulletinsWithRecordID(id <BBDataProvider> data
 + (int)_iconVariantForUIApplicationIconFormat:(int)uiapplicationIconFormat scale:(CGFloat *)scale;
 - (UIImage *)_applicationIconImageForFormat:(int)format precomposed:(BOOL)precomposed scale:(CGFloat)scale;
 - (UIImage *)_applicationIconImageForFormat:(int)format precomposed:(BOOL)precomposed;
+@end
+
+@interface SBMediaController (iOS5)
+- (NSDictionary *)_nowPlayingInfo;
 @end

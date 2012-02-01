@@ -11,6 +11,7 @@ __attribute__((visibility("hidden")))
 	NSString *nowPlayingTitle;
 	NSString *nowPlayingArtist;
 	NSString *nowPlayingAlbum;
+	UIImage *nowPlayingImage;
 }
 
 @end
@@ -39,6 +40,7 @@ static MusicBannersProvider *sharedProvider;
 	[nowPlayingTitle release];
 	[nowPlayingArtist release];
 	[nowPlayingAlbum release];
+	[nowPlayingImage release];
 	[super dealloc];
 }
 
@@ -95,6 +97,15 @@ static MusicBannersProvider *sharedProvider;
 		hasChanges = YES;
 	}
 	if (hasChanges) {
+		NSData *data = [[mc _nowPlayingInfo] objectForKey:@"artworkData"];
+		if (data) {
+			UIImage *image = [[UIImage alloc] initWithData:data];
+			[nowPlayingImage release];
+			nowPlayingImage = image;
+		} else {
+			[nowPlayingImage release];
+			nowPlayingImage = nil;
+		}
 		BBDataProviderWithdrawBulletinsWithRecordID(self, @"com.apple.mobileipod/banner");
 		if ([artist length] && [title length]) {
 			if (!bulletin) {
@@ -112,9 +123,55 @@ static MusicBannersProvider *sharedProvider;
 			NSDate *date = [NSDate date];
 			bulletin.date = date;
 			bulletin.lastInterruptDate = date;
+			bulletin.primaryAttachmentType = nowPlayingImage ? 1 : 0;
 			BBDataProviderAddBulletin(self, bulletin);
 		}
 	}
+}
+
+- (CGFloat)attachmentAspectRatioForRecordID:(NSString *)recordID
+{
+	if (nowPlayingImage) {
+		CGSize size = nowPlayingImage.size;
+		if (size.height > 0.0f)
+			return size.width / size.height;
+	}
+	return 1.0f;
+}
+
+- (NSData *)attachmentPNGDataForRecordID:(NSString *)recordID sizeConstraints:(BBThumbnailSizeConstraints *)constraints
+{
+	if (constraints && nowPlayingImage) {
+		CGSize imageSize = nowPlayingImage.size;
+		CGSize maxSize;
+		maxSize.width = constraints.fixedWidth;
+		maxSize.height = constraints.fixedHeight;
+		// Doesn't properly check constraintType, but this is good enough for now
+		if (maxSize.width > 0.0f) {
+			if (maxSize.height > 0.0f) {
+				if (imageSize.width *maxSize.height > maxSize.width * imageSize.height)
+					maxSize.height = maxSize.width * imageSize.height /  imageSize.width;
+				else
+					maxSize.width = maxSize.height * imageSize.width / imageSize.height;
+			} else {
+				maxSize.height = maxSize.width * imageSize.height /  imageSize.width;
+			}
+		} else {
+			if (maxSize.height > 0.0f) {
+				maxSize.width = maxSize.height * imageSize.width / imageSize.height;
+			} else {
+				// Fit image in 0x0? Wat.
+				return nil;
+			}
+		}
+		UIGraphicsBeginImageContextWithOptions(maxSize, NO, constraints.thumbnailScale);
+		CGContextSetInterpolationQuality(UIGraphicsGetCurrentContext(), kCGInterpolationDefault);
+		[nowPlayingImage drawInRect:(CGRect){{0.0f,0.0f},maxSize}];
+		UIImage *result = UIGraphicsGetImageFromCurrentImageContext();
+		UIGraphicsEndImageContext();
+		return UIImagePNGRepresentation(result);
+	}
+	return nil;
 }
 
 @end
