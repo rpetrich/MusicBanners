@@ -4,6 +4,7 @@
 
 %config(generator=internal)
 
+
 __attribute__((visibility("hidden")))
 @interface MusicBannersProvider : NSObject<BBDataProvider> {
 @private
@@ -46,7 +47,7 @@ static MusicBannersProvider *sharedProvider;
 
 - (NSString *)sectionIdentifier
 {
-	return @"com.apple.mobileipod";
+	return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) ? @"com.apple.Music" : @"com.apple.mobileipod";
 }
 
 - (NSArray *)sortDescriptors
@@ -192,10 +193,12 @@ static MusicBannersProvider *sharedProvider;
 
 + (UIImage *)_applicationIconImageForBundleIdentifier:(NSString *)bundleIdentifier format:(int)format scale:(CGFloat)scale
 {
-	if ((format == 10) && [bundleIdentifier isEqualToString:@"com.apple.mobileipod"]) {
+	%log;
+	BOOL isPad;
+	if ((format == 10) && [bundleIdentifier isEqualToString:(isPad = [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) ? @"com.apple.Music" : @"com.apple.mobileipod"]) {
 		// Try nc_icon.png, but fallback to generating an icon based on Icon-Small.png
-		NSBundle *bundle = [NSBundle bundleWithPath:(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) ? @"/Applications/Music~ipad.app" : @"/Applications/Music~iphone.app"];
-		return [UIImage imageNamed:@"nc_icon.png" inBundle:bundle] ?: [[UIImage imageNamed:@"Icon-Small.png" inBundle:bundle] _applicationIconImageForFormat:format precomposed:YES scale:scale];
+		NSBundle *bundle = [NSBundle bundleWithPath:isPad ? @"/Applications/Music~ipad.app" : @"/Applications/Music~iphone.app"];
+		return [UIImage imageNamed:@"nc_icon.png" inBundle:bundle] ?: [isPad ? [UIImage imageNamed:@"iPod.png" inBundle:[NSBundle bundleWithPath:@"/Applications/Preferences.app"]] : [UIImage imageNamed:@"Icon-Small.png" inBundle:bundle] _applicationIconImageForFormat:format precomposed:YES scale:scale];
 	}
 	return %orig;
 }
