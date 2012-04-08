@@ -177,18 +177,6 @@ static MusicBannersProvider *sharedProvider;
 
 @end
 
-%hook BBServer
-
-- (void)_loadAllDataProviderPluginBundles
-{
-	%orig;
-	MusicBannersProvider *p = [[MusicBannersProvider alloc] init];
-	[self _addDataProvider:p sortSectionsNow:YES];
-	[p release];
-}
-
-%end
-
 %hook UIImage
 
 + (UIImage *)_applicationIconImageForBundleIdentifier:(NSString *)bundleIdentifier format:(int)format scale:(CGFloat)scale

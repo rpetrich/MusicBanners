@@ -3,10 +3,10 @@ Priority: optional
 Section: Tweaks
 Maintainer: Ryan Petrich <rpetrich+musicbanners@gmail.com>
 Architecture: iphoneos-arm
-Version: 0.1
+Version: 1.0
 Description: Banners for track changes
 Name: MusicBanners
-Depends: firmware (>= 5.0), mobilesubstrate
+Depends: firmware (>= 5.0), mobilesubstrate, com.chpwn.weeloader (>= 1.1)
 Author: Ryan Petrich <rpetrich+musicbanners@gmail.com>
 Tag: purpose::extension
 dev: rpetrich
