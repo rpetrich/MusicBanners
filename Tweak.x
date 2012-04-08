@@ -181,7 +181,6 @@ static MusicBannersProvider *sharedProvider;
 
 + (UIImage *)_applicationIconImageForBundleIdentifier:(NSString *)bundleIdentifier format:(int)format scale:(CGFloat)scale
 {
-	%log;
 	BOOL isPad;
 	if ((format == 10) && [bundleIdentifier isEqualToString:(isPad = [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) ? @"com.apple.Music" : @"com.apple.mobileipod"]) {
 		// Try nc_icon.png, but fallback to generating an icon based on Icon-Small.png
